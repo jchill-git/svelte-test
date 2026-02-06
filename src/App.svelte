@@ -4,6 +4,7 @@
 
 	let el;
   let el2;
+  let el3;
 
   var dataset=[];
   for (var i = 0; i <15 ; i++){
@@ -57,11 +58,41 @@
     circles.attr("cx", (d,i) => {
       return (i * 50) + 135;
     })
-    .attr("cy", h/2)
-    .attr("r", (d) => d)
-    .attr("fill", "#087ca7")
-    .attr("stroke", "#05B2DC")
-    .attr("stroke-width", (d) =>  d/2);
+      .attr("cy", h/2)
+      .attr("r", (d) => d)
+      .attr("fill", "#087ca7")
+      .attr("stroke", "#05B2DC")
+      .attr("stroke-width", (d) =>  d/2);
+    
+
+    var svg2 = d3.select(el3)
+      .append("svg")
+      .attr("width", w)
+      .attr("height", h);
+
+    var trunks = svg2.selectAll("rect")
+      .data(dataset)
+      .enter()
+      .append("rect");
+
+    trunks.attr("width", (d) => d/3)
+      .attr("height", (d) => d*3)
+      .attr("x", (d,i) => (i * 50) +135)
+      .attr("y", (d) => h-d*3)
+      .attr("fill", "brown")
+
+    var leaves = svg2.selectAll("circle")
+      .data(dataset)
+      .enter()
+      .append("circle");
+
+    leaves.attr("cx", (d,i) => {
+      return (i * 50) + 135 + d/6;
+    })
+      .attr("cy", (d) => h-d*2-3)
+      .attr("r", (d) => d)
+      .attr("fill", "green");
+
     
 	});
 
@@ -79,6 +110,8 @@
 <p>The city at night.</p>
 <div bind:this={el2}></div>
 <p>Bubbles in a pond.</p>
+<div bind:this={el3}></div>
+<p>Trees in a park.</p>
 
 
 <style>
