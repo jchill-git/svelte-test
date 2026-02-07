@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import * as d3 from 'd3';
+  import dragon from './assets/dragon.png';
 
 	let el;
   let el2;
@@ -167,13 +168,42 @@
       .attr("stroke", "#05B2DC")
       .attr("stroke-width", (d) =>  d/2);
     
+    
     //Trees
+
     var svg3 = d3.select(el3)
       .append("svg")
       .attr("width", w)
-      .attr("height", h+50);
+      .attr("height", h);
+    
+    //sky
+    svg3.append("rect")
+      .attr("width",w)
+      .attr("height",h)
+      .attr("fill", "lightcyan")
+    //ground
+    svg3.append("rect")
+      .attr("width",w)
+      .attr("height",5)
+      .attr("y",h-5)
+      .attr("fill", "darkseagreen")
+    //creature
+    const flipped = Math.random() < 0.5 ? -1 : 1;
+    var location = Math.random()*w
+    if(Math.random() < 0.5){
+      svg3.append("image")
+        .attr("href",dragon)
+        .attr("x", location)
+        .attr("y", 100)
+        .attr("width", 50)
+        .attr("height", 50)
+        .attr("transform", flipped === -1
+        ? `scale(-1,1) translate(${-2*location + 50}, 0)` : null)
+        .attr("credit", "image from freepik")
+    }
 
-    var trunks = svg3.selectAll("rect")
+    //trunks
+    var trunks = svg3.selectAll("div")
       .data(dataset)
       .enter()
       .append("rect");
@@ -181,8 +211,8 @@
     trunks.attr("width", (d) => d/3)
       .attr("height", (d) => d*3)
       .attr("x", (d,i) => (i * 50) +135)
-      .attr("y", (d) => h+50-d*3)
-      .attr("fill", "brown")
+      .attr("y", (d) => h-d*3-5)
+      .attr("fill", "saddlebrown")
 
     var tree = svg3.selectAll("g")
       .data(dataset)
@@ -218,7 +248,7 @@
             height : d.value*3,
             width : d.value/3,
             x : (d.index * 50) +135,
-            y : h+50-d.value*3,
+            y : h-d.value*3+5,
             evergreen : d.evergreen
           }
           treeAtrributes.push(treeDimensions);
@@ -229,7 +259,7 @@
       .enter()
       .append("polygon")
       .filter((d) => d.evergreen)
-      .attr("points", (d,i) => { return `${d.x+5+d.width/2},${200-(d.height/d.triangles)-10-i*(d.height/d.triangles)} ${d.x+(2*d.width+5)+d.width/2},${Math.max(200-d.height,200-i*10)-5} ${d.x-(2*d.width-5)+d.width/2},${Math.max(200-d.height,200-i*10)-5}`})
+      .attr("points", (d,i) => { return `${d.x+5+d.width/2},${h-(d.height/d.triangles)-20-i*(d.height/d.triangles)} ${d.x+(2*d.width+5)+d.width/2},${Math.max(h-d.height,h-i*10)-5} ${d.x-(2*d.width-5)+d.width/2},${Math.max(h-d.height,150-i*10)-5}`})
       .attr("fill", "#326139");
 
 
@@ -238,7 +268,7 @@
     
     leaves.selectAll("g") //15 trunks
       .data((d,i) => {
-        var leafCount = Math.floor(d.value)
+        var leafCount = Math.max(3,Math.floor(d.value/2));
 
         var leafAttributes = []
 
@@ -258,7 +288,7 @@
       .attr("cx", (d,i) => {
         return (d.index * 50) + 135 + (Math.max(1, Math.random()* jitterWidth*d.value/12))-(Math.random()* jitterWidth*d.value/12)+5
       })
-      .attr("cy", (d) => h+50-d.value*2 + (Math.random()*jitterWidth*d.value/20) -(Math.random()* jitterWidth*d.value/12) )
+      .attr("cy", (d) => h-d.value*2 + (Math.random()*jitterWidth*d.value/20) -(Math.random()* jitterWidth*d.value/12) -10)
       .attr("r", (d) => d.value/1.5)
       .attr("fill", "green")
       .attr("fill-opacity", ".5")
