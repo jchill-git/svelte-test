@@ -8,49 +8,143 @@
 
   var dataset=[];
   for (var i = 0; i <15 ; i++){
-    var newValue = Math.random() * 30;
+    var newValue = Math.max(5, Math.random() * 30);
     dataset.push(newValue)
   }
 
   var w = 1000;
-  var h = 100;
+  var h = 150;
 
   $inspect(dataset);
   
 	onMount(() => {
-    /* d3.csv("src/assets/athlete_events.csv", function(data) {
-      dataset = data;
-    }); 
+    //Cityscape
+    var svg = d3.select(el)
+      .append("svg")
+      .attr("width", w)
+      .attr("height", h);
 
-		d3.select(el)
-			.selectAll("div")
-			.data(data)
-			.enter()
-			.append("div")
-			.style("width", function(d) {
-				return d + "px";
-			})
-			.text(function(d) {
-				return d;
-			}); */
-    
-    d3.select(el)
-      .selectAll("p")
+    //sky
+    svg.append("rect")
+      .attr("width",w)
+      .attr("height",h)
+      .attr("fill", "black")
+
+    //moon
+    var moonX = (w-125)*Math.random()+125
+    $inspect(moonX)
+    svg.append("circle")
+      .attr("cx",moonX)
+      .attr("cy",25)
+      .attr("r",20)
+      .attr("fill", "beige")
+    svg.append("circle")
+      .attr("cx",moonX-Math.random()*40+Math.random()*40)
+      .attr("cy",25)
+      .attr("r",20)
+      .attr("fill", "black")
+
+    var skylines = svg.selectAll("g") //there is one svg
       .data(dataset)
-      .enter()
-      .append("div")
-      .attr("class", "bar")
-      .style("height", (d) => {
-        var barHeight = d*5;
-        return barHeight + "px"
-      });
+      .join("g")
+
+    var buildings = skylines.append("rect");
     
-    var svg = d3.select(el2)
+    function buildingColor() {
+      let seed = Math.random()
+      if (seed < 1/3){
+        return "purple"
+      }
+      else if (seed < 2/3) {
+        return "slateblue"
+      }
+      else {
+        return "indigo"
+      }
+    }
+
+    buildings.attr("width", (d) => Math.min(Math.max(20,600/d),125))
+      .attr("height", (d) => d*5-10)
+      .attr("x", (d,i) => i * 50+125)
+      .attr("y", (d) => h-d*5+10)
+      .style("fill", (d) => buildingColor() )
+      .attr("data",(d,i) => [i,d])
+      .attr("stroke", "white");
+
+    var windows = skylines.append("g")
+      .attr("transform", (d, i) => `translate(-5, 0)`)
+
+    
+    var columns = windows.selectAll("g") //there are 15 data points
+      .data((d,i) => {
+
+        var colCount = Math.floor(Math.min(Math.max(20,600/d),125)/20);
+        
+        let rectAttributes = [];
+        
+        for(let j = 0; j <= colCount; j++){
+          const rectDimensions = {
+          height : d*5-10,
+          width : Math.min(Math.max(20,600/d),125),
+          x : i * 50+125,
+          y : h-d*5+10,
+          index : j,
+          count : colCount
+          };
+          
+          rectAttributes.push(rectDimensions);
+        }
+        return rectAttributes;
+      })
+      .enter()
+      .append("g")
+      .attr("class", "column")
+      .attr("height", 5)
+      .attr("width", 5)
+      .attr("x", (d,i) => d.x)
+      .attr("y", (d) => d.y + 5)
+      .attr("fill", "yellow")
+      .attr("count", 5)
+      .attr("building-width", (d) => d.width);
+      
+    columns.selectAll("div") //there are ? columns
+      .data((d, i) => {
+        var levelCount = Math.floor(d.height/10)-1;
+
+        let colAttributes = [];
+
+        for(let k = 0; k <= levelCount; k++){
+          const colDimensions = {
+            x : d.x,
+            y : d.y,
+            index : d.index,
+            levels : levelCount,
+            columns : d.count,
+            width : d.width,
+            height : d.height
+          };
+          $inspect(colDimensions);
+          colAttributes.push(colDimensions);
+        }
+        return colAttributes;
+      })
+      .enter()
+      .append("rect")
+      .attr("height", 5)
+      .attr("width", 5)
+      .attr("x", (d,i) => (d.x+5) + (10*d.index) + ((d.width-(5*(2*d.columns+1)))/2))
+      .attr("y", (d,i) => d.y + 10*i + 5)
+      .attr("fill", "yellow")
+      .attr("offset", (d) => ((d.width-(5*(2*d.columns+1)))/2)); 
+      //((d.width-5(2*.d.count-1))/2)
+//d.x + ((d.width-5*(2*d.count-1))/2)+(d.index)*10
+    //Circles
+    var svg2 = d3.select(el2)
       .append("svg")
       .attr("width", w)
       .attr("height", h);
         
-    var circles = svg.selectAll("circle")
+    var circles = svg2.selectAll("circle")
       .data(dataset)
       .enter()
       .append("circle");
@@ -64,13 +158,13 @@
       .attr("stroke", "#05B2DC")
       .attr("stroke-width", (d) =>  d/2);
     
-
-    var svg2 = d3.select(el3)
+    //Trees
+    var svg3 = d3.select(el3)
       .append("svg")
       .attr("width", w)
-      .attr("height", h);
+      .attr("height", h+50);
 
-    var trunks = svg2.selectAll("rect")
+    var trunks = svg3.selectAll("rect")
       .data(dataset)
       .enter()
       .append("rect");
@@ -78,21 +172,30 @@
     trunks.attr("width", (d) => d/3)
       .attr("height", (d) => d*3)
       .attr("x", (d,i) => (i * 50) +135)
-      .attr("y", (d) => h-d*3)
+      .attr("y", (d) => h+50-d*3)
       .attr("fill", "brown")
 
-    var leaves = svg2.selectAll("circle")
+    var leaves = svg3.selectAll("g")
       .data(dataset)
       .enter()
-      .append("circle");
+      .append("g")
+      .attr("transform", (d, i) => `translate(-5, 0)`);
 
-    leaves.attr("cx", (d,i) => {
-      return (i * 50) + 135 + d/6;
-    })
-      .attr("cy", (d) => h-d*2-3)
-      .attr("r", (d) => d)
-      .attr("fill", "green");
+    var jitterWidth = 20;
 
+    leaves.selectAll("circle")
+      .data(dataset)
+      .enter()
+      .append("circle")
+      .attr("cx", (d,i) => {
+        return (i * 50) + 135 + (Math.max(1, Math.random()* jitterWidth*d/12))-(Math.random()* jitterWidth*d/12)+5
+      })
+      .attr("cy", (d) => h+50-d*2 + (Math.random()*jitterWidth*d/20) -(Math.random()* jitterWidth*d/12) - 10)
+      .attr("r", (d) => d/1.5)
+      .attr("fill", "green")
+      .attr("fill-opacity", ".5")
+      .attr("stroke-width", "3")
+      .attr("stroke","darkgreen");
     
 	});
 
@@ -102,9 +205,7 @@
 
 
 <h1>My Chart</h1>
-<svg width="50" height="50">
-  <circle cx="25" cy="25" r="20" fill="rgba(128, 0, 128, 1.0)"/>
-</svg>
+
 
 <div bind:this={el}></div>
 <p>The city at night.</p>
