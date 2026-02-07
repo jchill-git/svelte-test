@@ -32,7 +32,7 @@
 
     //moon
     var moonX = (w-125)*Math.random()+125
-    $inspect(moonX)
+
     svg.append("circle")
       .attr("cx",moonX)
       .attr("cy",25)
@@ -133,7 +133,6 @@
             width : d.width,
             height : d.height
           };
-          $inspect(colDimensions);
           colAttributes.push(colDimensions);
         }
         return colAttributes;
@@ -185,28 +184,88 @@
       .attr("y", (d) => h+50-d*3)
       .attr("fill", "brown")
 
-    var leaves = svg3.selectAll("g")
+    var tree = svg3.selectAll("g")
       .data(dataset)
       .enter()
       .append("g")
       .attr("transform", (d, i) => `translate(-5, 0)`);
 
-    var jitterWidth = 20;
+    var leaves = tree.selectAll("div") //15 trunks
+      .data((d,i) => {
+        return [{
+          value : d,
+          index : i,
+          evergreen : Math.random()<0.5
+        }]
 
-    leaves.selectAll("circle")
-      .data(dataset)
+      })
+      .enter()
+      .append("g")
+      .attr("value", (d) => d.value)
+      .attr("evergreen", (d) => d.evergreen)
+
+    //evergreen
+    leaves.selectAll("g") //15 trunks
+      .data((d,i) => {
+        var triCount = Math.max(1,Math.floor(d.value/5));
+
+        var treeAtrributes = [];
+
+        for(let k = 0; k <= triCount; k++){
+          const treeDimensions = {
+            triangles : triCount+1,
+            index : d.index,
+            height : d.value*3,
+            width : d.value/3,
+            x : (d.index * 50) +135,
+            y : h+50-d.value*3,
+            evergreen : d.evergreen
+          }
+          treeAtrributes.push(treeDimensions);
+        }
+
+        return treeAtrributes;
+      })
+      .enter()
+      .append("polygon")
+      .filter((d) => d.evergreen)
+      .attr("points", (d,i) => { return `${d.x+5+d.width/2},${200-(d.height/d.triangles)-10-i*(d.height/d.triangles)} ${d.x+(2*d.width+5)+d.width/2},${Math.max(200-d.height,200-i*10)-5} ${d.x-(2*d.width-5)+d.width/2},${Math.max(200-d.height,200-i*10)-5}`})
+      .attr("fill", "#326139");
+
+
+    //deciduous
+    var jitterWidth = 20;
+    
+    leaves.selectAll("g") //15 trunks
+      .data((d,i) => {
+        var leafCount = Math.floor(d.value)
+
+        var leafAttributes = []
+
+        for(let m = 0; m <= leafCount; m++){
+          const leafDimensions = {
+            value : d.value,
+            index : d.index,
+            evergreen : d.evergreen
+          }
+          leafAttributes.push(leafDimensions);
+        }
+        return leafAttributes
+      })
       .enter()
       .append("circle")
+      .filter((d) => !d.evergreen)
       .attr("cx", (d,i) => {
-        return (i * 50) + 135 + (Math.max(1, Math.random()* jitterWidth*d/12))-(Math.random()* jitterWidth*d/12)+5
+        return (d.index * 50) + 135 + (Math.max(1, Math.random()* jitterWidth*d.value/12))-(Math.random()* jitterWidth*d.value/12)+5
       })
-      .attr("cy", (d) => h+50-d*2 + (Math.random()*jitterWidth*d/20) -(Math.random()* jitterWidth*d/12) - 10)
-      .attr("r", (d) => d/1.5)
+      .attr("cy", (d) => h+50-d.value*2 + (Math.random()*jitterWidth*d.value/20) -(Math.random()* jitterWidth*d.value/12) )
+      .attr("r", (d) => d.value/1.5)
       .attr("fill", "green")
       .attr("fill-opacity", ".5")
       .attr("stroke-width", "3")
       .attr("stroke","darkgreen");
-    
+  
+
 	});
 
 
@@ -218,11 +277,11 @@
 
 
 <div bind:this={el}></div>
-<p>The city at night.</p>
-<div bind:this={el2}></div>
-<p>Bubbles in a pond.</p>
+<p>Eclipse City.</p>
+<!-- <div bind:this={el2}></div>
+<p>Bubbles in a pond.</p> -->
 <div bind:this={el3}></div>
-<p>Trees in a park.</p>
+<p>The Enchanted Forest.</p>
 
 
 <style>
