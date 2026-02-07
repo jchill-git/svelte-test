@@ -106,6 +106,16 @@
       .attr("fill", "yellow")
       .attr("count", 5)
       .attr("building-width", (d) => d.width);
+
+      function windowColor() {
+      let seed = Math.random()
+      if (seed < 1/2){
+        return "lemonchiffon"
+      }
+      else {
+        return "slategray"
+      }
+    }
       
     columns.selectAll("div") //there are ? columns
       .data((d, i) => {
@@ -134,11 +144,10 @@
       .attr("width", 5)
       .attr("x", (d,i) => (d.x+5) + (10*d.index) + ((d.width-(5*(2*d.columns+1)))/2))
       .attr("y", (d,i) => d.y + 10*i + 5)
-      .attr("fill", "lemonchiffon")
-      .attr("stroke","khaki")
+      .style("fill", (d) => windowColor())
       .attr("offset", (d) => ((d.width-(5*(2*d.columns+1)))/2)); 
-      //((d.width-5(2*.d.count-1))/2)
-//d.x + ((d.width-5*(2*d.count-1))/2)+(d.index)*10
+
+
     //Circles
     var svg2 = d3.select(el2)
       .append("svg")
