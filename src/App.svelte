@@ -134,7 +134,8 @@
       .attr("width", 5)
       .attr("x", (d,i) => (d.x+5) + (10*d.index) + ((d.width-(5*(2*d.columns+1)))/2))
       .attr("y", (d,i) => d.y + 10*i + 5)
-      .attr("fill", "yellow")
+      .attr("fill", "lemonchiffon")
+      .attr("stroke","khaki")
       .attr("offset", (d) => ((d.width-(5*(2*d.columns+1)))/2)); 
       //((d.width-5(2*.d.count-1))/2)
 //d.x + ((d.width-5*(2*d.count-1))/2)+(d.index)*10
