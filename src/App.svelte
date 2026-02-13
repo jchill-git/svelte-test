@@ -299,19 +299,31 @@
 	});
 
 
+let currScene = $state(true);
 </script>
 
 
-
 <h1>My Chart</h1>
-
-
-<div bind:this={el}></div>
+<button onclick ={() => currScene = !currScene}>Swap</button>
+<p></p>
+<div style:display={currScene ? 'block' : 'none'} bind:this={el}></div>
+<div style:display={currScene ? 'none' : 'block'} bind:this={el3}></div>
+<p style:display={currScene ? 'block' : 'none'}>Eclipse City.</p>
+<p style:display={currScene ? 'none' : 'block'}>The Enchanted Forest.</p>
+<!-- <div bind:this={el}></div>
 <p>Eclipse City.</p>
-<!-- <div bind:this={el2}></div>
-<p>Bubbles in a pond.</p> -->
-<div bind:this={el3}></div>
-<p>The Enchanted Forest.</p>
+<div bind:this={el2}></div>
+<p>Bubbles in a pond.</p> 
+
+
+
+<div bind:this={el3}></div>-->
+
+
+
+
+
+
 
 
 <style>
@@ -323,4 +335,20 @@
     background-color: blueviolet;
     margin-right: 30px;
 	}
+
+  button {
+		cursor: pointer;
+		padding: 0.5rem 1rem;
+		border: 1px solid ;
+		margin-bottom: -1px;
+		background-color: #fff;
+
+	}
+	button.selected {
+		border-top-right-radius: 8px;
+		border-top-left-radius: 8px;
+		border-top-width: 8px;
+		border-color: #b0b #abc #fff;
+	}
+
 </style>
