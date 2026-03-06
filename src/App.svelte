@@ -6,9 +6,10 @@
 	let el;
   let el2;
   let el3;
+  let arraySize = $state(15)
 
   var dataset=[];
-  for (var i = 0; i <15 ; i++){
+  for (var i = 0; i <arraySize ; i++){
     var newValue = Math.max(5, Math.random() * 30);
     dataset.push(newValue)
   }
@@ -17,6 +18,14 @@
   var h = 150;
 
   $inspect(dataset);
+
+  $effect(() =>{
+    //re-render on data change
+    if(arraySize !== 15){
+      $inspect(arraySize)
+    }
+
+  })
   
 	onMount(() => {
     //Cityscape
@@ -66,7 +75,7 @@
 
     buildings.attr("width", (d) => Math.min(Math.max(20,600/d),125))
       .attr("height", (d) => d*5-10)
-      .attr("x", (d,i) => i * 50+125)
+      .attr("x", (d,i) => i * 50+1875/arraySize)
       .attr("y", (d) => h-d*5+10)
       .style("fill", (d) => buildingColor() )
       .attr("data",(d,i) => [i,d])
@@ -303,8 +312,12 @@ let currScene = $state(true);
 </script>
 
 
-<h1>My Chart</h1>
-<button onclick ={() => currScene = !currScene}>Swap</button>
+<h1>Landscape Generator</h1>
+<!--<label>
+  <input type="range" bind:value={arraySize} min="0" max="30"/>
+</label>-->
+<p></p>
+<button onclick ={() => currScene = !currScene}>Swap Theme</button>
 <p></p>
 <div style:display={currScene ? 'block' : 'none'} bind:this={el}></div>
 <div style:display={currScene ? 'none' : 'block'} bind:this={el3}></div>
